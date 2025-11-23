@@ -135,7 +135,7 @@ async function loadNFTs() {
           ev.target.disabled = false;
           return;
         }
-        await listNFT(tokenid, price).catch(console.error);
+        await listNFT(tokenid, price, card).catch(console.error);
         ev.target.disabled = false;
       };
     }
@@ -187,7 +187,7 @@ async function buyNFT(nftRecord) {
 }
 
 // ---------------- LIST NFT ----------------
-async function listNFT(tokenid, price) {
+async function listNFT(tokenid, price, card) {
   if (!signer || !seaport) return alert("Cüzdan qoşulmayıb!");
   const seller = await signer.getAddress();
 
@@ -244,6 +244,11 @@ async function listNFT(tokenid, price) {
 
   const j = await res.json();
   if (!j.success) return alert("Backend order-u qəbul etmədi!");
+  
+  // ---------------- Update price in front-end ----------------
+  const priceEl = card.querySelector('.price');
+  priceEl.textContent = `Qiymət: ${price} APE`;
+
   notify(`NFT #${tokenid} list olundu — ${price} APE`);
 
   loadedCount = 0;
