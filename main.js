@@ -113,6 +113,7 @@ async function loadNFTs() {
         <h4>${name}</h4>
         <p class="price">Qiymət: -</p>
         <div class="nft-actions">
+          <input type="number" min="0" step="0.01" class="price-input" placeholder="Qiymət (APE)">
           <button class="wallet-btn buy-btn" data-id="${tokenid}">Buy</button>
           <button class="wallet-btn list-btn" data-token="${tokenid}">List</button>
         </div>
@@ -127,7 +128,14 @@ async function loadNFTs() {
 
       card.querySelector(".list-btn").onclick = async (ev) => {
         ev.target.disabled = true;
-        await listNFT(tokenid).catch(console.error);
+        const priceInput = card.querySelector(".price-input");
+        const price = parseFloat(priceInput.value);
+        if (!price || isNaN(price)) {
+          notify("Qiymət düzgün deyil, listing ləğv edildi.");
+          ev.target.disabled = false;
+          return;
+        }
+        await listNFT(tokenid, price).catch(console.error);
         ev.target.disabled = false;
       };
     }
@@ -179,7 +187,7 @@ async function buyNFT(nftRecord) {
 }
 
 // ---------------- LIST NFT ----------------
-async function listNFT(tokenid) {
+async function listNFT(tokenid, price) {
   if (!signer || !seaport) return alert("Cüzdan qoşulmayıb!");
   const seller = await signer.getAddress();
 
@@ -197,10 +205,7 @@ async function listNFT(tokenid) {
   const owner = (await nftContract.ownerOf(tokenid)).toLowerCase();
   if (owner !== seller.toLowerCase()) return alert("Bu NFT sənin deyil!");
 
-  let price = prompt("NFT neçə APE? (məs: 1.5)");
-  if (!price || isNaN(price)) return notify("Listing ləğv edildi.");
-
-  const priceWei = ethers.utils.parseEther(price);
+  const priceWei = ethers.utils.parseEther(price.toString());
   const approved = await nftContract.isApprovedForAll(seller, SEAPORT_CONTRACT_ADDRESS);
   if (!approved) {
     notify("Approve göndərilir...");
