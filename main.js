@@ -111,7 +111,7 @@ async function loadNFTs() {
         <img src="${image}" alt="NFT image"
           onerror="this.src='https://ipfs.io/ipfs/QmExampleNFTImage/default.png'">
         <h4>${name}</h4>
-        <p class="price">Qiymət: -</p>
+        <p class="price">Qiymət: ${nft.price || '-' } APE</p>
         <div class="nft-actions">
           <input type="number" min="0" step="0.01" class="price-input" placeholder="Qiymət (APE)">
           <button class="wallet-btn buy-btn" data-id="${tokenid}">Buy</button>
@@ -231,6 +231,7 @@ async function listNFT(tokenid, price, card) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       tokenid: tokenid,
+      price: price, // <- price backend-ə göndərilir
       nft_contract: NFT_CONTRACT_ADDRESS,
       marketplace_contract: SEAPORT_CONTRACT_ADDRESS,
       buyer_address: null,
